@@ -1,3 +1,15 @@
+/**
+ * wake-on-home Lambda fulfillment handler
+ *
+ * Handles Google Smart Home intents forwarded from API Gateway.
+ * On an EXECUTE/OnOff=true intent, POSTs to the local WoL bridge
+ * (exposed via Cloudflare Tunnel) which sends the magic packet.
+ *
+ * Required env vars:
+ *   BRIDGE_URL    — https://wake.harrislstud.io/wake
+ *   BRIDGE_SECRET — shared secret, must match the bridge process
+ */
+
 import fetch from 'node-fetch';
 
 const BRIDGE_URL = process.env.BRIDGE_URL;
@@ -20,6 +32,7 @@ export const handler = async (event) => {
       const command = input.payload.commands[0];
       const execution = command.execution[0];
 
+      // Only act on "turn on" — "turn off" is a no-op (can't sleep a PC via WoL)
       if (execution.command === 'action.devices.commands.OnOff' && execution.params.on) {
         await fetch(BRIDGE_URL, {
           method: 'POST',
@@ -38,6 +51,7 @@ export const handler = async (event) => {
   return { statusCode: 400, body: JSON.stringify({ error: 'Unhandled intent' }) };
 };
 
+// Tells Google Home what devices exist under this account
 function buildSyncResponse(requestId) {
   return {
     statusCode: 200,
@@ -57,6 +71,7 @@ function buildSyncResponse(requestId) {
   };
 }
 
+// Always reports the switch as "off" — it's a momentary trigger, not a stateful toggle
 function buildQueryResponse(requestId) {
   return {
     statusCode: 200,
