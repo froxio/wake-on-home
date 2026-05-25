@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+bridge/node_modules/
+lambda/node_modules/
+
+# Environment — never commit real secrets
+.env
+.env.local
+bridge/.env
+lambda/.env
+
+# Lambda build artifact
+lambda/function.zip
+
+# macOS
+.DS_Store
+
+# Claude Code local config
+.claude/
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*

@@ -1,0 +1,22 @@
+{
+  "actions": [
+    {
+      "name": "actions.devices",
+      "deviceControl": {
+        "capabilities": [
+          {
+            "name": "actions.capabilities.SMART_HOME"
+          }
+        ]
+      }
+    }
+  ],
+  "conversations": {
+    "wake_on_home": {
+      "name": "wake_on_home",
+      "fulfillmentApiVersion": 2,
+      "fulfillmentUrl": "YOUR_API_GATEWAY_ENDPOINT_URL"
+    }
+  },
+  "locale": "en"
+}
