@@ -20,6 +20,7 @@
 export const handler = async (event) => {
   const method = event.requestContext?.http?.method || event.httpMethod;
   const path = event.requestContext?.http?.path || event.path;
+  console.log(JSON.stringify({ method, path, qs: event.queryStringParameters, body: event.body }));
 
   if (method === 'GET' && path === '/auth') {
     return handleAuth(event);
@@ -39,6 +40,7 @@ function handleAuth(event) {
   const clientId = params.client_id;
 
   if (clientId !== process.env.OAUTH_CLIENT_ID) {
+    console.log(`auth: client_id mismatch — got "${clientId}", expected "${process.env.OAUTH_CLIENT_ID}"`);
     return { statusCode: 401, body: 'Invalid client_id' };
   }
 
@@ -53,10 +55,11 @@ function handleAuth(event) {
 }
 
 function handleToken(event) {
-  const body = parseBody(event.body, event.headers?.['content-type']);
+  const body = parseBody(event.body, event.headers?.['content-type'], event.isBase64Encoded);
   const { grant_type, code, client_id, client_secret, refresh_token } = body;
 
   if (client_id !== process.env.OAUTH_CLIENT_ID || client_secret !== process.env.OAUTH_CLIENT_SECRET) {
+    console.log(`token: credential mismatch — client_id match: ${client_id === process.env.OAUTH_CLIENT_ID}, secret match: ${client_secret === process.env.OAUTH_CLIENT_SECRET}`);
     return { statusCode: 401, body: JSON.stringify({ error: 'invalid_client' }) };
   }
 
@@ -79,8 +82,9 @@ function handleToken(event) {
   };
 }
 
-function parseBody(raw, contentType) {
+function parseBody(raw, contentType, isBase64Encoded) {
   if (!raw) return {};
-  if (contentType?.includes('application/json')) return JSON.parse(raw);
-  return Object.fromEntries(new URLSearchParams(raw));
+  const decoded = isBase64Encoded ? Buffer.from(raw, 'base64').toString('utf8') : raw;
+  if (contentType?.includes('application/json')) return JSON.parse(decoded);
+  return Object.fromEntries(new URLSearchParams(decoded));
 }

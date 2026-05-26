@@ -4,12 +4,14 @@
   "private": true,
   "workspaces": [
     "bridge",
-    "lambda"
+    "lambda",
+    "oauth"
   ],
   "scripts": {
     "install:bridge": "npm install --workspace=bridge",
     "install:lambda": "npm install --workspace=lambda",
     "start:bridge": "npm run start --workspace=bridge",
-    "deploy:lambda": "cd lambda && zip -r function.zip . && cd .."
+    "deploy:lambda": "cd lambda && zip -r function.zip . && cd ..",
+    "deploy:oauth": "cd oauth && zip -r function.zip . && cd .."
   }
 }

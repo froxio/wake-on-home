@@ -15,11 +15,8 @@ FUNCTION_NAME="wake-on-home"
 REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/lambda-basic-execution"
 
-echo "==> Installing dependencies"
-npm install
-
 echo "==> Zipping function"
-zip -r function.zip . --exclude "*.sh" "deploy.sh"
+zip -r function.zip index.js package.json
 
 if aws lambda get-function --function-name "$FUNCTION_NAME" --region "$REGION" &>/dev/null; then
   echo "==> Updating existing function"

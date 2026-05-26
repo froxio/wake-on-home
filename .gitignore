@@ -9,8 +9,13 @@ lambda/node_modules/
 bridge/.env
 lambda/.env
 
-# Lambda build artifact
+# Lambda build artifacts
 lambda/function.zip
+lambda/output.json
+lambda/package-lock.json
+oauth/function.zip
+oauth/output.json
+package-lock.json
 
 # macOS
 .DS_Store

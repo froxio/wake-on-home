@@ -10,8 +10,6 @@
  *   BRIDGE_SECRET — shared secret, must match the bridge process
  */
 
-import fetch from 'node-fetch';
-
 const BRIDGE_URL = process.env.BRIDGE_URL;
 const BRIDGE_SECRET = process.env.BRIDGE_SECRET;
 
@@ -32,9 +30,12 @@ export const handler = async (event) => {
       const command = input.payload.commands[0];
       const execution = command.execution[0];
 
+      console.log(`EXECUTE command=${execution.command} on=${execution.params.on}`);
+
       // Only act on "turn on" — "turn off" is a no-op (can't sleep a PC via WoL)
       if (execution.command === 'action.devices.commands.OnOff' && execution.params.on) {
-        await fetch(BRIDGE_URL, {
+        console.log(`Calling bridge at ${BRIDGE_URL}`);
+        const res = await fetch(BRIDGE_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -42,6 +43,9 @@ export const handler = async (event) => {
           },
           body: JSON.stringify({ wake: true }),
         });
+        console.log(`Bridge response: ${res.status}`);
+      } else {
+        console.log('Skipping bridge call — on=false');
       }
 
       return buildExecuteResponse(requestId, command.devices.map(d => d.id));
